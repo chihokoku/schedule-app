@@ -1,8 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 
 function Example() {
     return (
+
         <div className="container">
             <div className="row justify-content-center">
                 <div className="col-md-8">
@@ -17,14 +18,17 @@ function Example() {
     );
 }
 
+
 export default Example;
 
-if (document.getElementById('example')) {
-    const Index = ReactDOM.createRoot(document.getElementById("example"));
+// if (document.getElementById('app')) {
+//     const Index = ReactDOM.createRoot(document.getElementById("app"));
 
-    Index.render(
-        <React.StrictMode>
-            <Example/>
-        </React.StrictMode>
-    )
+//     Index.render(
+//             <Example/>
+//     )
+// }
+
+if (document.getElementById('app')) {
+    ReactDOM.render(<Example />, document.getElementById('app'));
 }

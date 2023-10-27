@@ -10,6 +10,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "@babel/preset-react": "^7.22.15",
         "@popperjs/core": "^2.11.6",
         "@vitejs/plugin-react": "^2.2.0",
         "axios": "^0.25",
