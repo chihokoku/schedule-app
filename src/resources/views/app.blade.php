@@ -14,9 +14,9 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
     <!-- Scripts -->
-    {{-- @viteReactRefresh
-    @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    @viteReactRefresh
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
 
 </head>
 <body>
