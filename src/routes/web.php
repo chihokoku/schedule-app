@@ -1,7 +1,9 @@
 <?php
 
+// use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,10 +19,12 @@ use Illuminate\Support\Facades\Auth;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-Route::get('{any}', function () {
+Route::get('/', function () {
     return view('app');
-})->where('any','.*');
+});
 
+
+// Route::post("/post", ScheduleController::class, "create")->name('create');
 // Auth::routes();
 
 
