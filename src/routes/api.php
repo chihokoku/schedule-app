@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\ScheduleController;
 
 
 Route::group(['middleware'=>'api'],function(){
-    Route::get('posts',[ScheduleController::class, "scheduleindex"]);
-
+    // Route::get('posts',[ScheduleController::class, "index"]);
+    Route::post('posts',[ScheduleController::class, "index"]);
+    Route::post('posts/create',[ScheduleController::class, "create"]);
 });

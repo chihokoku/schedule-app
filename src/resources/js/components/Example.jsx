@@ -1,6 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Fragment, useState} from 'react';
+import {Fragment, useState, useEffect} from 'react';
+import axios from 'axios';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import  DialogActions  from '@mui/material/DialogActions';
 
 
 
@@ -22,16 +33,95 @@ function Example() {
         } else {
           setMonth(nextMonth)
         }
-
-
     }
-    return (
 
+
+    //スケジュールのデータ
+    const [schedules,setSche] = useState([])
+
+    //画面読み込み時に、1度だけ起動
+    useEffect(()=>{
+        getPostData();
+    },[])
+
+    //バックエンドからデータ一覧を取得
+    const getPostData = () =>{
+        axios
+        .post('/api/posts')
+        .then(response=>{
+            setSche(response.data); //バックエンドからのデータをセット
+            console.log(response.data);
+        }).catch(()=>{
+            console.log('通信に失敗しました');
+        });
+    }
+
+    //データ格納の空配列を作成
+    let rows = [];
+
+    //スケジュールデータをrowに格納する
+    schedules.map((post)=>
+        rows.push({
+            sch_id:post.id,
+            sch_category:post.sch_category,
+            sch_contents:post.sch_contents,
+            sch_date:post.sch_date,
+            sch_time:post.sch_time
+        })
+    );
+
+    //登録用ポップアップ開閉処理
+    const[open,setOpen] = useState(false);
+
+    const handleClickOpen = (e) =>{
+        setOpen(true);
+    };
+
+    const handleClose = () =>{
+        setOpen(false);
+    };
+
+    //新規登録用データ配列
+    const [formData,setFormData] = useState({sch_category:'',sch_contents:'',sch_date:'',sch_hour:'',sch_min:''});
+
+    //入力値を一時保存
+    const inputChange = (e) =>{
+        const key = e.target.name;
+        const value = e.target.value;
+        formData[key] = value;
+        let datas = Object.assign({},formData);
+        setFormData(datas);
+        console.log(formData);
+    }
+    //登録処理
+    const createSchedule = async() => {
+        //入力値を投げる
+        await axios
+            .post('/api/posts/create',{
+                sch_category:formData.sch_category,
+                sch_contents:formData.sch_contents,
+                sch_date:formData.sch_date,
+                sch_time:formData.sch_hour + ':' + formData.sch_min
+            })
+            .then((res)=>{
+                //戻り値をtodosにセット
+                const tempPosts = post;
+                tempPosts.push(res.data);
+                setPosts(tempPosts)
+                setFormData('');
+            })
+            .catch(error=>{
+                console.log(error);
+            })
+    }
+
+
+
+
+    return (
         <Fragment>
-        <div className="container">
             <div className="calender-header">
                 <h1>{`${year}年${month}月`}</h1>
-                <p><a href=""></a>追加する</p>
                 <div className="calender-nav">
                     <button onClick={onClick(-1)}>{'<先月'}</button>
                     <button onClick={onClick(1)}>{'翌月>'}</button>
@@ -47,12 +137,17 @@ function Example() {
                     {calendar.map((week,i) => (
                         <tr key={week.join('')}>
                             {week.map((day,j) => (
-                                <td key={`${i}${j}`} id={day} >
+                                <td key={`${i}${j}`} id={day} onClick={handleClickOpen}>
                                     <div>
                                         <div>
                                             {day > last ? day - last : day <= 0 ? prevlast + day : day}
                                         </div>
                                         <div className="schedule-area">
+                                            {rows.map((schedule,k) => (
+                                                schedule.sch_date == year + '-' + zeroPadding(month) + '-' + zeroPadding(day) &&
+                                                    <div className='schedule-title' key={k}>{schedule.sch_contents}</div>
+
+                                            ))}
                                         </div>
                                     </div>
                                 </td>
@@ -61,9 +156,34 @@ function Example() {
                     ))}
                 </tbody>
             </table>
-        </div>
+            <Dialog onClose={handleClose} open={open}>
+                <DialogTitle>Subscribe</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        スケジュール登録
+                    </DialogContentText>
+                    <TextField margin="dense" id="sch_date" name="sch_date" label="予定日" type="text" fullWidth variant="standard" onChange={inputChange}/>
+                    <InputLabel id="sch_time_label">時刻</InputLabel>
+                    <Select labelId="sch_hour" id="sch_hour_select" name="sch_hour" label="Hour" variant="standard" defaultValue="00" onChange={inputChange}>
+                        <MenuItem value="00">00</MenuItem><MenuItem value="01">01</MenuItem>
+                    </Select>
+                    <Select labelId="sch_min" id="sch_min_select" name="sch_min" label="Min" variant="standard" defaultValue="00" onChange={inputChange}>
+                        <MenuItem value="00">00</MenuItem><MenuItem value="01">01</MenuItem>
+                    </Select>
+                    <InputLabel id="sch_category_label">カテゴリー</InputLabel>
+                    <Select labelId="sch_category" id="sch_category_select" name="sch_category" label="Category" variant="standard" defaultValue="勉強" onChange={inputChange}>
+                        <MenuItem value="勉強">勉強</MenuItem>
+                        <MenuItem value="案件">案件</MenuItem>
+                        <MenuItem value="テスト">テスト</MenuItem>
+                    </Select>
+                    <TextField margin="dense" id="sch_contents" name="sch_contents" label="内容" type="text" fullWidth variant="standard" onChange={inputChange}/>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button href="/dashboard" onClick={createSchedule}>Subscribe</Button>
+                </DialogActions>
+            </Dialog>
         </Fragment>
-
     );
 }
 
@@ -78,6 +198,9 @@ function createCalendear(year,month){
     })
 }
 
+function zeroPadding(num){
+    return ('0' + num).slice(-2);
+}
 
 export default Example;
 
