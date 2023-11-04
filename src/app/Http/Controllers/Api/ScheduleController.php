@@ -8,13 +8,14 @@ use App\Models\Schedule;
 
 class ScheduleController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $schedules = Schedule::all();
         return response()->json($schedules);
     }
 
-
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $schedules = new Schedule;
         $schedules->sch_date = $request->sch_date;
         $schedules->sch_time = $request->sch_time;
@@ -23,5 +24,4 @@ class ScheduleController extends Controller
         $schedules->save();
         return response()->json($schedules);
     }
-
 }
